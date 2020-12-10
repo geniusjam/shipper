@@ -35,6 +35,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", async (req, res) => {
 	if (!req.session.user) {
+		req.session.lastPage = req.path;
 		return res.render("index", {
 			oauthLink: config.oauthLink,
 		});
@@ -72,7 +73,7 @@ app.get("/signin", async (req, res, next) => {
 
 		req.session.user = user.id;
 
-		res.redirect("/");
+		res.redirect(req.session.lastPage || "/");
 	} catch (e) {
 		console.error(e);
 		next();
@@ -155,6 +156,8 @@ app.get("/ship/:id", async (req, res, next) => {
 	}
 
 	try {
+		req.session.lastPage = req.path;
+
 		res.render("ship", {
 			user: req.session.user ? await db.getUser(req.session.user) : null,
 			ship: doc,
@@ -198,4 +201,6 @@ app.post("/logout", (req, res) => {
 	res.redirect("/");
 });
 
-app.listen({ port: process.env.PORT || 3000 }, () => console.log("I] Listening"));
+app.listen({ port: process.env.PORT || 3000 }, () =>
+	console.log("I] Listening")
+);
