@@ -198,4 +198,4 @@ app.post("/logout", (req, res) => {
 	res.redirect("/");
 });
 
-app.listen({ port: 3000 }, () => console.log("I] Listening"));
+app.listen({ port: process.env.PORT || 3000 }, () => console.log("I] Listening"));
