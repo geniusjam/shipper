@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<title>Ship Someone - Shipper</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<link rel="preconnect" href="https://fonts.gstatic.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+			rel="stylesheet"
+		/>
+
+		<link
+			rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+			crossorigin="anonymous"
+		/>
+
+		<link rel="stylesheet" href="/assets/css/main.css" />
+	</head>
+	<body>
+		<div class="container mt-5">
+			<div class="row justify-content-center">
+				<div class="col-md-6">
+					<h1 class="text-center m-3">Ship someone!</h1>
+					<p class="small">Or go back to <a href="/">home page</a>.</p>
+					<% if(error) { %>
+					<p class="alert alert-danger"><%= error %></p>
+					<% } %>
+					<form method="POST" action="/ship">
+						<p>Please enter IDs of people who you want to ship.</p>
+						<input
+							type="number"
+							class="form-control"
+							name="p0"
+							placeholder="Person 1"
+						/>
+						<input
+							type="number"
+							class="form-control mt-2 mb-2"
+							name="p1"
+							placeholder="Person 2"
+						/>
+						<input
+							class="btn btn-primary"
+							type="submit"
+							value="Start Shipping!"
+						/>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

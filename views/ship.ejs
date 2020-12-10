@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<title>&lt;3 &lt;3 - Shipper</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<link rel="preconnect" href="https://fonts.gstatic.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+			rel="stylesheet"
+		/>
+
+		<link
+			rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+			integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+			crossorigin="anonymous"
+		/>
+
+		<link rel="stylesheet" href="/assets/css/main.css" />
+	</head>
+	<body>
+		<div class="container mt-5">
+			<div class="row mt-5 justify-content-center">
+				<h1 class="text-danger">&hearts; &lt;3&lt;3&lt;3&lt;3 &hearts;</h1>
+			</div>
+			<div class="row mt-5">
+				<% ship.people.forEach(person => { %>
+				<div class="col-md-6">
+					<p class="h3 text-center">
+						<%- include("partials/user", { user: person }) %>
+					</p>
+				</div>
+				<% }); %>
+			</div>
+			<div class="row mt-5 mb-5">
+				<div class="col text-center">
+					<p class="h2">
+						<span class="text-primary"
+							><%= ship.shippers.length %> <%= ship.shippers.length === 1 ?
+							"person" : "people" %></span
+						>
+						ship<%= ship.shippers.length === 1 ? "s" : ""%> <%=
+						ship.people.map(q => q.username).join(" and ") %>
+					</p>
+					<% if(user && ship.shippers.includes(user._id)) { %>
+					<p class="small">including you</p>
+					<% } %> <% if(user) { %>
+					<form method="POST" action="/toggleShip">
+						<input hidden type="text" name="ship" value="<%= ship.id %>" />
+						<input type="submit" class="btn discord-button" value="<%=
+						ship.shippers.includes(user._id) ? "Uns" : "S" %>hip"/>
+					</form>
+					<% } else { %>
+					<a href="<%= oauthLink %>" class="btn discord-button"
+						>Sign in with Discord to ship</a
+					>
+					<% } %>
+				</div>
+			</div>
+			<% if(user) { %>
+			<div class="row justify-content-center mb-5">
+				<a href="/">Go back to home page</a>
+			</div>
+			<% } %>
+		</div>
+	</body>
+</html>
