@@ -69,7 +69,6 @@ const funcs = {
 		return new Promise((res, rej) => {
 			for (const user of users.values()) {
 				if (user._id === id) {
-					console.log("This worked too!!");
 					return res(user);
 				}
 			}
@@ -160,8 +159,8 @@ const funcs = {
 					ship.people.length === people.length &&
 					people.every(
 						ship.populated("people")
-							? (p) => ship.people.includes(p)
-							: (p) => ship.people.some((q) => q._id === p)
+							? (p) => ship.people.some((q) => q._id === p)
+							: (p) => ship.people.includes(p)
 					)
 				) {
 					console.log("yo dis worked");
@@ -169,17 +168,14 @@ const funcs = {
 				}
 			}
 
-			Ship.findOne(
-				{ $or: [{ people }, { people: people.reverse() }] },
-				function (err, r) {
-					if (err) {
-						return rej(err);
-					}
-					res(r);
-
-					ships.set(r.id, r);
+			Ship.findOne({ people: { $all: people } }, function (err, r) {
+				if (err) {
+					return rej(err);
 				}
-			);
+				res(r);
+
+				ships.set(r.id, r);
+			});
 		});
 	},
 	shipExists: async function (id) {

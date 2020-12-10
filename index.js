@@ -115,9 +115,9 @@ app.post("/ship", async (req, res) => {
 
 		people.push(await db.getUser(p0), await db.getUser(p1));
 
-		const ids = people.map((p) => p._id);
+		const ids = people.map((p) => p._id + "");
 		const exists = await db.shipExists({
-			$or: [{ people: ids }, { people: ids.reverse() }],
+			people: { $all: ids },
 		});
 
 		let doc;
