@@ -38,6 +38,8 @@ app.get("/", async (req, res) => {
 		req.session.lastPage = req.path;
 		return res.render("index", {
 			oauthLink: config.oauthLink,
+			githubRepo: config.githubRepo,
+			author: config.author
 		});
 	}
 
