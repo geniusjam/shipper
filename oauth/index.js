@@ -48,7 +48,21 @@ async function getToken(code, refresh) {
 	};
 }
 
+/**
+ * @param {String} id Discord ID of the user
+ */
+async function fetchUser(id) {
+	const response = await fetch(`https://discord.com/api/v8/users/${id}`, {
+		headers: {
+			Authorization: `Bot ${config.botToken}`,
+		},
+	});
+	if (!response.ok) throw new Error(`Error status code: ${response.status}`);
+	return JSON.parse(await response.json());
+}
+
 module.exports = {
 	getToken,
 	getUser,
+	fetchUser,
 };

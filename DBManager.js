@@ -44,8 +44,15 @@ const users = new Map();
 const ships = new Map();
 
 const funcs = {
-	updateUser: async function (data) {
-		//
+	updateUser: async function (id, data) {
+		return new Promise((res, rej) => {
+			User.findOneAndUpdate({ id }, data, (e, r) => {
+				if (e) {
+					return rej(e);
+				}
+				res(r);
+			});
+		});
 	},
 	registerUser: async function (data) {
 		const doc = new User({

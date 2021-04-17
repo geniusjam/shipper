@@ -108,15 +108,43 @@ app.post("/ship", async (req, res) => {
 		const user = await db.getUser(req.session.user);
 
 		const people = [];
-		if (!(await db.userExists(p0)) || !(await db.userExists(p1))) {
-			return res.render("createShip", {
-				user,
-				error:
-					"These people aren't registered to our system yet. Share this website with them so you can ship them!",
-			});
+		if (!(await db.userExists(p0))) {
+			try {
+				const dcUser = await oauth.fetchUser(p0);
+				const doc = await db.registerUser({
+					token: '-',
+					...dcUser,
+				});
+				people.push(doc);
+			} catch {
+				return res.render("createShip", {
+					user,
+					error:
+						"Couldn't find a person with ID " + p0 + "!",
+				});
+			}
+		} else {
+			people.push(await db.getUser(p0));
 		}
 
-		people.push(await db.getUser(p0), await db.getUser(p1));
+		if (!(await db.userExists(p1))) {
+			try {
+				const dcUser = await oauth.fetchUser(p1);
+				const doc = await db.registerUser({
+					token: '-',
+					...dcUser,
+				});
+				people.push(doc);
+			} catch {
+				return res.render("createShip", {
+					user,
+					error:
+						"Couldn't find a person with ID " + p1 + "!",
+				});
+			}
+		} else {
+			people.push(await db.getUser(p1));
+		}
 
 		const ids = people.map((p) => p._id + "");
 		const exists = await db.shipExists({

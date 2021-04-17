@@ -12,3 +12,4 @@ A website to ship Discord users on
 | oauthLink    | OAuth URL for the "Sign in with Discord" buttons        |
 | githubRepo   | GitHub repository link to be displayed in the home page |
 | author       | Author of the app to be displayed on the home page      |
+| botToken     | A Discord bot's token                                   |
