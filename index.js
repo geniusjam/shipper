@@ -116,7 +116,8 @@ app.post("/ship", async (req, res) => {
 					...dcUser,
 				});
 				people.push(doc);
-			} catch {
+			} catch(e) {
+				console.warn(e);
 				return res.render("createShip", {
 					user,
 					error:
@@ -135,7 +136,8 @@ app.post("/ship", async (req, res) => {
 					...dcUser,
 				});
 				people.push(doc);
-			} catch {
+			} catch(e) {
+				console.warn(e);
 				return res.render("createShip", {
 					user,
 					error:
