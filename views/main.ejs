@@ -34,7 +34,32 @@
 						You currently have <%= user.shipping.length %> ship<%=
 						user.shipping.length === 1 ? "" : "s" %>
 					</p>
-
+				</div>
+			</div>
+			<% if(user.shipping.length > 0) { %>
+			<div class="row">
+				<% user.shipping.forEach(ship => { %>
+				<div class="col-md-3 border border-info p-5 rounded m-1">
+					<div class="row">
+						<% ship.people.forEach(person => {%>
+						<div class="col-sm-6 text-center">
+							<img class="rounded-circle"
+								src="https://cdn.discordapp.com/avatars/<%= person.id + "/" + person.avatar%>.png"
+								alt="pfp" />
+						</div>
+						<% }); %>
+					</div>
+					<div class="row justify-content-center mt-5">
+						<a href="/ship/<%= ship.id %>">
+							<button class="btn discord-button"> Details </button>
+						</a>
+					</div>
+				</div>
+				<% }); %>
+			</div>
+			<% } %>
+			<div class="row">
+				<div class="col">
 					<a href="/ship" class="btn btn-primary mt-5">Ship someone!</a>
 				</div>
 			</div>

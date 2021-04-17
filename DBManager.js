@@ -185,6 +185,18 @@ const funcs = {
 			});
 		});
 	},
+	getShipByMongoId: function (id) {
+		return new Promise((res, rej) => {
+				return Ship.findById(id, function (err, r) {
+					if (err) {
+						return rej(err);
+					}
+					res(r);
+
+					ships.set(r.people, r);
+				});
+		});
+	},
 	shipExists: async function (id) {
 		return typeof id == "object"
 			? await Ship.exists(id)

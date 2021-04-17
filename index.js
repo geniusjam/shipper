@@ -8,6 +8,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const session = require("express-session");
+const { isValidObjectId } = require("mongoose");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const sessionsStore = new MongoDBStore({
 	uri: config.databaseUrl,
@@ -45,6 +46,19 @@ app.get("/", async (req, res) => {
 
 	try {
 		const user = await db.getUser(req.session.user);
+		if (user.shipping.some(ship => isValidObjectId(ship))) {
+			user.shipping = await Promise.all(
+				user.shipping.map((s) => db.getShipByMongoId(s))
+			);
+			for(const ship of user.shipping) {
+				if(ship.people.some(person => isValidObjectId(person))) {
+					ship.people = await Promise.all(
+						ship.people.map((p) => db.getUserByMongoId(p))
+					);
+				}
+			}
+		}
+
 		res.render("main", { user });
 	} catch (e) {
 		console.error(e);
