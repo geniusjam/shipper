@@ -58,7 +58,7 @@ async function fetchUser(id) {
 		},
 	});
 	if (!response.ok) throw new Error(`Error status code: ${response.status}`);
-	return JSON.parse(await response.json());
+	return await response.json();
 }
 
 module.exports = {
