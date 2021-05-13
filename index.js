@@ -40,18 +40,18 @@ app.get("/", async (req, res) => {
 		return res.render("index", {
 			oauthLink: config.oauthLink,
 			githubRepo: config.githubRepo,
-			author: config.author
+			author: config.author,
 		});
 	}
 
 	try {
 		const user = await db.getUser(req.session.user);
-		if (user.shipping.some(ship => isValidObjectId(ship))) {
+		if (user.shipping.some((ship) => isValidObjectId(ship))) {
 			user.shipping = await Promise.all(
 				user.shipping.map((s) => db.getShipByMongoId(s))
 			);
-			for(const ship of user.shipping) {
-				if(ship.people.some(person => isValidObjectId(person))) {
+			for (const ship of user.shipping) {
+				if (ship.people.some((person) => isValidObjectId(person))) {
 					ship.people = await Promise.all(
 						ship.people.map((p) => db.getUserByMongoId(p))
 					);
@@ -60,6 +60,24 @@ app.get("/", async (req, res) => {
 		}
 
 		res.render("main", { user });
+
+		for (const ship of user.shipping) {
+			for (const person of ship.people) {
+				const fetched = await oauth.fetchUser(person.id);
+				fetched.publicFlags = fetched.public_flags;
+				delete fetched.public_flags;
+
+				if (
+					fetched.username !== person.username ||
+					fetched.avatar !== person.avatar ||
+					fetched.discriminator !== person.discriminator ||
+					fetched.publicFlags !== person.publicFlags
+				) {
+					console.log("Updating user", person.id);
+					await db.updateUser(person.id, fetched);
+				}
+			}
+		}
 	} catch (e) {
 		console.error(e);
 		delete req.session.user;
@@ -74,6 +92,8 @@ app.get("/signin", async (req, res, next) => {
 	try {
 		const tokenData = await oauth.getToken(code);
 		const user = await oauth.getUser(tokenData.token);
+		user.publicFlags = user.public_flags;
+		delete user.public_flags;
 
 		if (!(await db.userExists(user.id))) {
 			await db.registerUser({
@@ -125,17 +145,18 @@ app.post("/ship", async (req, res) => {
 		if (!(await db.userExists(p0))) {
 			try {
 				const dcUser = await oauth.fetchUser(p0);
+				dcUser.publicFlags = dcUser.public_flags;
+				delete dcUser.public_flags;
 				const doc = await db.registerUser({
-					token: '-',
+					token: "-",
 					...dcUser,
 				});
 				people.push(doc);
-			} catch(e) {
+			} catch (e) {
 				console.warn(e);
 				return res.render("createShip", {
 					user,
-					error:
-						"Couldn't find a person with ID " + p0 + "!",
+					error: "Couldn't find a person with ID " + p0 + "!",
 				});
 			}
 		} else {
@@ -145,17 +166,18 @@ app.post("/ship", async (req, res) => {
 		if (!(await db.userExists(p1))) {
 			try {
 				const dcUser = await oauth.fetchUser(p1);
+				dcUser.publicFlags = dcUser.public_flags;
+				delete dcUser.public_flags;
 				const doc = await db.registerUser({
-					token: '-',
+					token: "-",
 					...dcUser,
 				});
 				people.push(doc);
-			} catch(e) {
+			} catch (e) {
 				console.warn(e);
 				return res.render("createShip", {
 					user,
-					error:
-						"Couldn't find a person with ID " + p1 + "!",
+					error: "Couldn't find a person with ID " + p1 + "!",
 				});
 			}
 		} else {
@@ -209,6 +231,22 @@ app.get("/ship/:id", async (req, res, next) => {
 			ship: doc,
 			oauthLink: config.oauthLink,
 		});
+
+		for (const person of doc.people) {
+			const fetched = await oauth.fetchUser(person.id);
+			fetched.publicFlags = fetched.public_flags;
+			delete fetched.public_flags;
+			
+			if (
+				fetched.username !== person.username ||
+				fetched.avatar !== person.avatar ||
+				fetched.discriminator !== person.discriminator ||
+				fetched.publicFlags !== person.publicFlags
+			) {
+				console.log("Updating user", person.id);
+				await db.updateUser(person.id, fetched);
+			}
+		}
 	} catch (e) {
 		console.error(e);
 		delete req.session.user;

@@ -48,17 +48,52 @@ async function getToken(code, refresh) {
 	};
 }
 
+let rateLimit = null;
+const cache = new Map();
 /**
  * @param {String} id Discord ID of the user
  */
-async function fetchUser(id) {
-	const response = await fetch(`https://discord.com/api/v8/users/${id}`, {
-		headers: {
-			Authorization: `Bot ${config.botToken}`,
-		},
+function fetchUser(id, force = false) {
+	return new Promise(async (res, rej) => {
+		if (cache.has(id) && !force) {
+			return res(cache.get(id));
+		}
+
+		if (rateLimit) {
+			if (Date.now() >= rateLimit) {
+				rateLimit = null;
+			} else {
+				setTimeout(async () => {
+					rateLimit = null;
+					try {
+						res(await fetchUser(id));
+					} catch (e) {
+						rej(e);
+					}
+				}, rateLimit - Date.now());
+				return;
+			}
+		}
+
+		const response = await fetch(`https://discord.com/api/v8/users/${id}`, {
+			headers: {
+				Authorization: `Bot ${config.botToken}`,
+			},
+		});
+		if (!response.ok)
+			return rej(new Error(`Error status code: ${response.status}`));
+		const remaining = parseInt(response.headers.get("x-ratelimit-remaining"));
+		if (remaining === 0) {
+			rateLimit =
+				Date.now() +
+				1000 * parseFloat(response.headers.get("x-ratelimit-reset-after"));
+		}
+		const data = await response.json();
+		res(data);
+
+		cache.set(id, data);
+		setTimeout(() => cache.delete(id), 3 * 60 * 1000);
 	});
-	if (!response.ok) throw new Error(`Error status code: ${response.status}`);
-	return await response.json();
 }
 
 module.exports = {

@@ -50,6 +50,11 @@ const funcs = {
 				if (e) {
 					return rej(e);
 				}
+
+				if(users.has(id)) {
+					Object.assign(users.get(id), data);
+				}
+
 				res(r);
 			});
 		});
