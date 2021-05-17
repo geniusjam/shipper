@@ -80,7 +80,7 @@ const funcs = {
 	getUserByMongoId: function (id) {
 		return new Promise((res, rej) => {
 			for (const user of users.values()) {
-				if (user._id === id) {
+				if (user._id.equals(id)) {
 					return res(user);
 				}
 			}
@@ -171,7 +171,7 @@ const funcs = {
 					ship.people.length === people.length &&
 					people.every(
 						ship.populated("people")
-							? (p) => ship.people.some((q) => q._id === p)
+							? (p) => ship.people.some((q) => q._id.equals(p))
 							: (p) => ship.people.includes(p)
 					)
 				) {
