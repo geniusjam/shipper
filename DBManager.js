@@ -113,7 +113,7 @@ const funcs = {
 	},
 
 	ship: async function (user, ship) {
-		if (user.shipping.includes(ship._id)) {
+		if (user.shipping.some(s => s.equals(ship._id))) {
 			user.shipping.splice(
 				user.shipping.findIndex((s) => s.equals(ship._id)),
 				1
