@@ -8,7 +8,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const session = require("express-session");
-const { isValidObjectId } = require("mongoose");
+const { isValidObjectId, Document } = require("mongoose");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const sessionsStore = new MongoDBStore({
 	uri: config.databaseUrl,
@@ -46,15 +46,14 @@ app.get("/", async (req, res) => {
 
 	try {
 		const user = await db.getUser(req.session.user);
-		if (user.shipping.some((ship) => isValidObjectId(ship))) {
-			user.shipping = await Promise.all(
-				user.shipping.map((s) => db.getShipByMongoId(s))
-			);
-			for (const ship of user.shipping) {
-				if (ship.people.some((person) => isValidObjectId(person))) {
-					ship.people = await Promise.all(
-						ship.people.map((p) => db.getUserByMongoId(p))
-					);
+		for (let i = 0; i < user.shipping.length; i++) {
+			if(isValidObjectId(user.shipping[i]) && !(user.shipping[i] instanceof Document)) {
+				user.shipping[i] = await db.getShipByMongoId(user.shipping[i]);
+			}
+			const ship = user.shipping[i];
+			for (let j = 0; j < ship.people.length; j++) {
+				if(isValidObjectId(ship.people[j]) && !(ship.people[j] instanceof Document)) {
+					ship.people[j] = await db.getUserByMongoId(ship.people[j]);
 				}
 			}
 		}
