@@ -66,6 +66,10 @@ app.get("/", async (req, res) => {
 				fetched.publicFlags = fetched.public_flags;
 				delete fetched.public_flags;
 
+				if(fetched.publicFlags === undefined) {
+					fetched.publicFlags = person.publicFlags;
+				}
+
 				if (
 					fetched.username !== person.username ||
 					fetched.avatar !== person.avatar ||
@@ -235,6 +239,10 @@ app.get("/ship/:id", async (req, res, next) => {
 			const fetched = await oauth.fetchUser(person.id);
 			fetched.publicFlags = fetched.public_flags;
 			delete fetched.public_flags;
+			
+			if(fetched.publicFlags === undefined) {
+				fetched.publicFlags = person.publicFlags;
+			}
 			
 			if (
 				fetched.username !== person.username ||
